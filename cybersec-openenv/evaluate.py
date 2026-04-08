@@ -6,12 +6,13 @@ env = CyberSecurityEnv()
 agent = Agent()
 grader = CyberGrader()
 
-state = env.reset()
+state, _ = env.reset()
 trajectory = []
 
 while True:
     action = agent.select_action(state)
-    next_state, reward, done, _ = env.step(action)
+    next_state, reward, terminated, truncated, _ = env.step(action)
+    done = terminated or truncated
 
     trajectory.append((state, action, reward))
     state = next_state
