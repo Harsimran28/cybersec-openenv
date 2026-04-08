@@ -8,12 +8,13 @@ agent = Agent()
 rewards = []
 
 for episode in range(100):
-    state = env.reset()
+    state, _ = env.reset()
     total_reward = 0
 
     while True:
         action = agent.select_action(state)
-        next_state, reward, done, _ = env.step(action)
+        next_state, reward, terminated, truncated, _ = env.step(action)
+        done = terminated or truncated
 
         agent.store(state, action, reward, next_state, done)
         agent.train_step()
