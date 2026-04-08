@@ -5,20 +5,19 @@ class CyberSecurityEnv:
         self.state = None
         self.steps = 0
 
-        # Define observation space manually (important for OpenEnv)
-        self.observation_shape = (3,)
+        self.max_steps = 20
         self.action_space_n = 4
+        self.observation_shape = (3,)
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
+        if seed is not None:
+            np.random.seed(seed)
+
         self.steps = 0
+        self.state = np.array(np.random.rand(3), dtype=np.float32)
 
-        # FIX: ensure correct dtype + shape
-        self.state = np.array(
-            np.random.rand(3),
-            dtype=np.float32
-        )
-
-        return self.state
+        # IMPORTANT: return (obs, info)
+        return self.state, {}
 
     def step(self, action):
         assert 0 <= action < self.action_space_n, "Invalid action"
@@ -42,6 +41,8 @@ class CyberSecurityEnv:
         self.state = np.array([threat, health, traffic], dtype=np.float32)
         self.steps += 1
 
-        done = bool(self.steps >= 20 or health <= 0)
+        terminated = bool(health <= 0)
+        truncated = bool(self.steps >= self.max_steps)
 
-        return self.state, float(reward), done, {}
+        # IMPORTANT: return 5 values
+        return self.state, float(reward), terminated, truncated, {}
